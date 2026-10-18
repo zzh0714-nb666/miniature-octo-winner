@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>磁吸酷毙灯 - 电商产品套图</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #2c3e50;
+            font-size: 28px;
+        }
+        
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .gallery-item {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .gallery-item:hover {
+            transform: translateY(-5px);
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: 300px;
+            object-fit: contain;
+            background-color: #f8f9fa;
+        }
+        
+        .gallery-item h3 {
+            padding: 15px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #34495e;
+        }
+        
+        .gallery-item p {
+            padding: 0 15px 15px;
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        
+        .feature-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .feature-section h2 {
+            margin-bottom: 20px;
+            color: #2c3e50;
+            font-size: 20px;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .feature-item {
+            text-align: center;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+        }
+        
+        .feature-item img {
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+            margin-bottom: 15px;
+        }
+        
+        .feature-item h3 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #34495e;
+        }
+        
+        .feature-item p {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        
+        .scene-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .scene-section h2 {
+            margin-bottom: 20px;
+            color: #2c3e50;
+            font-size: 20px;
+        }
+        
+        .scene-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .scene-item {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .scene-item img {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+        }
+        
+        .scene-item .overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+            color: white;
+            padding: 20px;
+        }
+        
+        .scene-item h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .scene-item p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>磁吸酷毙灯 - 电商产品套图</h1>
+        
+        <!-- 主图展示 -->
+        <div class="gallery">
+            <div class="gallery-item">
+                <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=white%20magnetic%20LED%20desk%20light%20with%20remote%20control%2C%20product%20photography%2C%20white%20background%2C%20clean%20minimalist%20style&image_size=square_hd" alt="磁吸酷毙灯正面图">
+                <h3>主图 - 正面视角</h3>
+                <p>纯白简约设计，展现产品整体外观</p>
+            </div>
+            <div class="gallery-item">
+                <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=white%20magnetic%20LED%20desk%20light%20side%20view%2C%20product%20photography%2C%20white%20background%2C%20clean%20minimalist%20style&image_size=square_hd" alt="磁吸酷毙灯侧面图">
+                <h3>主图 - 侧面视角</h3>
+                <p>展示产品厚度和侧面细节</p>
+            </div>
+            <div class="gallery-item">
+                <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=white%20magnetic%20LED%20desk%20light%20with%20remote%20control%20and%20accessories%2C%20product%20photography%2C%20white%20background%2C%20clean%20minimalist%20style&image_size=square_hd" alt="磁吸酷毙灯套装">
+                <h3>主图 - 产品套装</h3>
+                <p>展示产品及全部配件</p>
+            </div>
+        </div>
+        
+        <!-- 细节展示 -->
+        <div class="feature-section">
+            <h2>产品细节</h2>
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=close%20up%20of%20magnetic%20base%20of%20LED%20desk%20light%2C%20product%20photography%2C%20white%20background&image_size=square" alt="磁吸底座">
+                    <h3>磁吸底座</h3>
+                    <p>强力磁铁吸附，稳固不脱落</p>
+                </div>
+                <div class="feature-item">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=close%20up%20of%20remote%20control%20for%20LED%20desk%20light%2C%20product%20photography%2C%20white%20background&image_size=square" alt="遥控器">
+                    <h3>遥控器</h3>
+                    <p>远程控制，方便调节亮度和色温</p>
+                </div>
+                <div class="feature-item">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=close%20up%20of%20LED%20strip%20with%20honeycomb%20anti-glare%20design%2C%20product%20photography%2C%20white%20background&image_size=square" alt="蜂窝防眩设计">
+                    <h3>蜂窝防眩</h3>
+                    <p>柔和光线，保护眼睛</p>
+                </div>
+                <div class="feature-item">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=close%20up%20of%20USB%20charging%20port%20on%20LED%20desk%20light%2C%20product%20photography%2C%20white%20background&image_size=square" alt="USB充电口">
+                    <h3>USB充电</h3>
+                    <p>充插两用，使用更灵活</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 场景展示 -->
+        <div class="scene-section">
+            <h2>使用场景</h2>
+            <div class="scene-grid">
+                <div class="scene-item">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=LED%20desk%20light%20installed%20under%20cabinet%20in%20kitchen%2C%20bright%20illumination%2C%20modern%20home%20interior&image_size=landscape_16_9" alt="厨房使用场景">
+                    <div class="overlay">
+                        <h3>厨房照明</h3>
+                        <p>安装在橱柜下方，提供充足照明</p>
+                    </div>
+                </div>
+                <div class="scene-item">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=LED%20desk%20light%20on%20study%20desk%20with%20books%20and%20laptop%2C%20student%20working%20environment%2C%20warm%20lighting&image_size=landscape_16_9" alt="书房使用场景">
+                    <div class="overlay">
+                        <h3>书房学习</h3>
+                        <p>为学习和工作提供舒适光线</p>
+                    </div>
+                </div>
+                <div class="scene-item">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=LED%20desk%20light%20in%20bedroom%20nightstand%2C%20reading%20before%20bed%2C%20cozy%20atmosphere&image_size=landscape_16_9" alt="卧室使用场景">
+                    <div class="overlay">
+                        <h3>卧室阅读</h3>
+                        <p>睡前阅读的理想伴侣</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 功能展示 -->
+        <div class="feature-section">
+            <h2>功能特点</h2>
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=LED%20desk%20light%20with%20different%20color%20temperature%20settings%2C%20warm%20and%20cool%20light%2C%20product%20demonstration&image_size=square" alt="三档色温">
+                    <h3>三档色温</h3>
+                    <p>暖光、自然光、冷光随意切换</p>
+                </div>
+                <div class="feature-item">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=LED%20desk%20light%20with%20dimming%20function%2C%20brightness%20adjustment%20demonstration%2C%20product%20photography&image_size=square" alt="无极调光">
+                    <h3>无极调光</h3>
+                    <p>亮度可自由调节，满足不同需求</p>
+                </div>
+                <div class="feature-item">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=person%20using%20remote%20control%20to%20operate%20LED%20desk%20light%2C%20convenient%20control%2C%20product%20demonstration&image_size=square" alt="远程遥控">
+                    <h3>远程遥控</h3>
+                    <p>无需起身，轻松控制灯光</p>
+                </div>
+                <div class="feature-item">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=LED%20desk%20light%20with%20battery%20indicator%2C%20rechargeable%20design%2C%20product%20photography&image_size=square" alt="充插两用">
+                    <h3>充插两用</h3>
+                    <p>内置电池，可无线使用</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
