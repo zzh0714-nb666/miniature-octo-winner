@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>干机循环 · 每日行情线报</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<script src="site-config.js"></script>
+<style>
+  :root {
+    --green-deep: #0f3d24;
+    --green-dark: #1b5e20;
+    --green-mid:  #2e7d32;
+    --green:      #43a047;
+    --green-bright:#66bb6a;
+    --green-light:#a5d6a7;
+    --cream:      #f1f8e9;
+    --gold:       #ffd54f;
+  }
+  html { scroll-behavior: smooth; }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--green-deep);
+    color: #fff;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  .page {
+    min-height: 100vh;
+    background:
+      radial-gradient(ellipse at 20% 0%, rgba(102,187,106,0.35), transparent 55%),
+      radial-gradient(ellipse at 80% 100%, rgba(67,160,71,0.25), transparent 50%),
+      linear-gradient(160deg, #1b5e20 0%, #0f3d24 60%, #082916 100%);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* 装饰性背景光斑 */
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.5;
+    pointer-events: none;
+  }
+  .blob.b1 { width: 320px; height: 320px; background: #66bb6a; top: -80px; right: -60px; animation: float1 12s ease-in-out infinite; }
+  .blob.b2 { width: 260px; height: 260px; background: #43a047; bottom: 10%; left: -80px; animation: float2 14s ease-in-out infinite; }
+  .blob.b3 { width: 200px; height: 200px; background: #81c784; top: 40%; right: 10%; opacity: 0.25; animation: float1 16s ease-in-out infinite reverse; }
+
+  @keyframes float1 {
+    0%,100% { transform: translate(0,0) scale(1); }
+    50% { transform: translate(20px, 30px) scale(1.08); }
+  }
+  @keyframes float2 {
+    0%,100% { transform: translate(0,0) scale(1); }
+    50% { transform: translate(-25px, -20px) scale(1.12); }
+  }
+
+  .container {
+    position: relative;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 40px 24px 60px;
+    z-index: 2;
+  }
+
+  /* 入场动画 */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(24px);
+    animation: fadeUp 0.8s cubic-bezier(.2,.8,.2,1) forwards;
+  }
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* 顶部品牌条 */
+  .brand-strip {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  .brand-strip .tag {
+    display: inline-block;
+    padding: 6px 16px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(165,214,167,0.35);
+    border-radius: 999px;
+    font-size: 13px;
+    letter-spacing: 1px;
+    color: var(--green-light);
+    backdrop-filter: blur(6px);
+  }
+
+  /* Hero 区 */
+  .hero {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  .hero h1 {
+    font-size: clamp(48px, 12vw, 92px);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: 4px;
+    background: linear-gradient(180deg, #ffffff 0%, #c8e6c9 55%, #81c784 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 4px 30px rgba(0,0,0,0.25);
+    margin-bottom: 12px;
+  }
+  .hero .subtitle {
+    font-size: 18px;
+    font-weight: 500;
+    color: #e8f5e9;
+    letter-spacing: 6px;
+    position: relative;
+    display: inline-block;
+    padding: 0 30px;
+  }
+  .hero .subtitle::before,
+  .hero .subtitle::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 22px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--green-light));
+  }
+  .hero .subtitle::before { right: 100%; transform: translateY(-50%); }
+  .hero .subtitle::after  { left: 100%; transform: translateY(-50%); background: linear-gradient(90deg, var(--green-light), transparent); }
+
+  .hero .desc {
+    margin-top: 18px;
+    font-size: 14px;
+    color: #c5e1a5;
+    line-height: 1.7;
+  }
+  .hero .desc b { color: #fff; font-weight: 700; }
+
+  /* 行情卡片 */
+  .quote-card {
+    background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+    border: 1px solid rgba(165,214,167,0.2);
+    border-radius: 20px;
+    padding: 22px 20px;
+    margin-bottom: 30px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  }
+  .quote-card .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px dashed rgba(165,214,167,0.2);
+  }
+  .quote-card .row:last-child { border-bottom: none; }
+  .quote-card .row-link {
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    border-radius: 10px;
+    padding: 12px 12px;
+    margin: 0 -12px;
+    transition: background .2s, transform .15s;
+  }
+  .quote-card .row-link:hover {
+    background: rgba(255,255,255,0.08);
+  }
+  .quote-card .row-link:active {
+    transform: scale(0.98);
+  }
+  .quote-card .row-link .chev {
+    display: inline-block;
+    margin-left: 6px;
+    color: var(--green-light);
+    font-size: 20px;
+    line-height: 1;
+    transition: transform .2s;
+  }
+  .quote-card .row-link:hover .chev {
+    transform: translateX(4px);
+  }
+  .quote-card .label {
+    font-size: 14px;
+    color: #e8f5e9;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .quote-card .label .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--gold);
+    box-shadow: 0 0 8px var(--gold);
+    animation: pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.3); }
+  }
+  .quote-card .value {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .quote-card .value .unit { font-size: 12px; color: var(--green-light); font-weight: 400; margin-left: 2px; }
+
+  /* 服务卖点 */
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  .section-title .bar {
+    width: 4px; height: 20px;
+    background: linear-gradient(180deg, var(--gold), #ffa000);
+    border-radius: 2px;
+  }
+  .section-title h2 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 1px;
+  }
+
+  .features {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 34px;
+  }
+  .feature {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(165,214,167,0.18);
+    border-radius: 14px;
+    padding: 16px 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    transition: transform .25s, background .25s, border-color .25s;
+  }
+  .feature:hover {
+    transform: translateY(-3px);
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(165,214,167,0.4);
+  }
+  .feature .icon {
+    flex-shrink: 0;
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--green), var(--green-mid));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    box-shadow: 0 4px 12px rgba(67,160,71,0.4);
+  }
+  .feature .text {
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: #e8f5e9;
+  }
+  .feature .text b { color: #fff; font-weight: 700; }
+
+  /* 二维码区 */
+  .qr-section {
+    background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.02));
+    border: 1px solid rgba(165,214,167,0.25);
+    border-radius: 24px;
+    padding: 28px 20px;
+    text-align: center;
+    margin-bottom: 30px;
+    position: relative;
+    overflow: hidden;
+  }
+  .qr-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 0%, rgba(255,213,79,0.08), transparent 60%);
+    pointer-events: none;
+  }
+  .qr-section .qr-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .qr-section .qr-sub {
+    font-size: 12px;
+    color: var(--green-light);
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+  }
+
+  .qr-wrap {
+    width: 180px;
+    height: 180px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 18px;
+    padding: 12px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.1);
+    position: relative;
+  }
+  .qr-wrap .qr-img {
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    display: block;
+    object-fit: contain;
+  }
+
+  .qr-tip {
+    margin-top: 16px;
+    font-size: 14px;
+    color: var(--gold);
+    font-weight: 500;
+    letter-spacing: 1px;
+  }
+  .qr-tip .hand {
+    display: inline-block;
+    animation: tap 2s ease-in-out infinite;
+  }
+  @keyframes tap {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+  }
+
+  /* 渠道 */
+  .channels {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+  }
+  .channel {
+    padding: 8px 16px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(165,214,167,0.2);
+    border-radius: 999px;
+    font-size: 13px;
+    color: #e8f5e9;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* 底部 */
+  .footer {
+    text-align: center;
+    font-size: 12px;
+    color: rgba(200,230,201,0.5);
+    line-height: 1.8;
+    padding-top: 10px;
+    border-top: 1px solid rgba(165,214,167,0.12);
+  }
+  .footer .company {
+    color: rgba(200,230,201,0.7);
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+
+  /* 响应式 */
+  @media (max-width: 480px) {
+    .features { grid-template-columns: 1fr; }
+    .container { padding: 30px 18px 50px; }
+  }
+
+  /* ========== 主图横幅 + 热点 ========== */
+  .banner {
+    margin: 24px 0 20px;
+  }
+  .banner-inner {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 7;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 14px 40px rgba(0,0,0,0.35);
+  }
+  .banner-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 15% 20%, rgba(255,255,255,0.15), transparent 40%),
+      radial-gradient(circle at 85% 80%, rgba(255,213,79,0.18), transparent 45%),
+      linear-gradient(135deg, #2e7d32 0%, #1b5e20 50%, #0f3d24 100%);
+  }
+  .banner-bg::after {
+    content: '♻️';
+    position: absolute;
+    bottom: 8%;
+    right: 6%;
+    font-size: clamp(40px, 8vw, 90px);
+    opacity: 0.18;
+  }
+  .banner-content {
+    position: absolute;
+    top: 12%;
+    left: 6%;
+    z-index: 2;
+  }
+  .banner-title {
+    font-size: clamp(16px, 3vw, 24px);
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #fff;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+  .banner-sub {
+    margin-top: 6px;
+    font-size: clamp(11px, 1.8vw, 14px);
+    color: var(--green-light);
+  }
+
+  /* 圆形热点容器 */
+  .hotspots {
+    position: absolute;
+    bottom: 14px;
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: clamp(20px, 5vw, 48px);
+    z-index: 5;
+  }
+  /* 圆形热点 */
+  .hotspot {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+    transition: transform .25s, box-shadow .25s;
+  }
+  .hotspot:hover {
+    transform: scale(1.25);
+    box-shadow: 0 0 0 6px rgba(255,213,79,0.4), 0 8px 24px rgba(0,0,0,0.4);
+  }
+  .hotspot-icon {
+    font-size: 20px;
+    line-height: 1;
+  }
+  .hotspot-label {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-size: 11px;
+    color: #fff;
+    background: rgba(0,0,0,0.55);
+    padding: 2px 8px;
+    border-radius: 6px;
+    opacity: 0;
+    transition: opacity .2s;
+    pointer-events: none;
+  }
+  .hotspot:hover .hotspot-label {
+    opacity: 1;
+  }
+  .hotspot-pulse {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: rgba(255,213,79,0.6);
+    animation: pulse 2s ease-out infinite;
+    z-index: -1;
+  }
+  @keyframes pulse {
+    0%   { transform: scale(1);   opacity: 0.6; }
+    100% { transform: scale(2.2); opacity: 0; }
+  }
+
+  /* ========== 功能圆球导航 ========== */
+  .nav-circles {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 18px 16px;
+    margin: 28px 0 8px;
+    padding: 22px 12px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(165,214,167,0.15);
+    border-radius: 18px;
+  }
+  .nav-circle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    width: 62px;
+    height: 62px;
+    border-radius: 50%;
+    background: linear-gradient(145deg, var(--green-mid), var(--green-dark));
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.2);
+    transition: transform .2s, box-shadow .2s, background .2s;
+    flex-shrink: 0;
+  }
+  .nav-circle:hover {
+    transform: translateY(-4px) scale(1.1);
+    background: linear-gradient(145deg, var(--green), var(--green-mid));
+    box-shadow: 0 0 0 4px rgba(102,187,106,0.25), 0 8px 20px rgba(67,160,71,0.4);
+  }
+  .nc-icon {
+    font-size: 24px;
+    line-height: 1;
+  }
+  .nc-text {
+    margin-top: 6px;
+    font-size: 11px;
+    color: #e8f5e9;
+    font-weight: 500;
+  }
+
+  /* 圆球显示后台上传的图片 */
+  .nav-circle.has-img {
+    padding: 0;
+    overflow: hidden;
+  }
+  .nav-circle .nc-img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* 手机端：圆球自动换行 */
+  @media (max-width: 480px) {
+    .nav-circles {
+      justify-content: center;
+      gap: 14px 18px;
+    }
+    .hotspot {
+      width: 36px;
+      height: 36px;
+    }
+    .hotspot-icon { font-size: 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+
+  <div class="container">
+    <!-- 顶部品牌条 -->
+    <div class="brand-strip fade-up" style="animation-delay:.05s">
+      <span class="tag">深圳华强北报废机源头回收商</span>
+    </div>
+
+    <!-- Hero -->
+    <header class="hero">
+      <h1 class="fade-up" style="animation-delay:.15s">干机循环</h1>
+      <div class="subtitle fade-up" style="animation-delay:.25s">每日行情线报</div>
+      <p class="desc fade-up" style="animation-delay:.35s">
+        <b>源头回收 · 没有中间商差价</b><br>
+        让每一台报废手机都发挥最大价值
+      </p>
+    </header>
+
+    <!-- 主图横幅 + 热点 -->
+    <div class="banner fade-up" style="animation-delay:.4s">
+      <div class="banner-inner">
+        <div class="banner-bg"></div>
+        <div class="banner-content">
+          <div class="banner-title">源头回收 · 没有中间商差价</div>
+          <div class="banner-sub">点击热点了解更多服务详情</div>
+        </div>
+        <!-- 圆形热点（整齐排列在横幅底部） -->
+        <div class="hotspots">
+          <a class="hotspot" href="#features" title="今日回收参考价">
+            <span class="hotspot-pulse"></span>
+            <span class="hotspot-icon">💰</span>
+            <span class="hotspot-label">今日参考价</span>
+          </a>
+          <a class="hotspot" href="product2.html" title="上门回收">
+            <span class="hotspot-pulse"></span>
+            <span class="hotspot-icon">🚚</span>
+            <span class="hotspot-label">上门回收</span>
+          </a>
+          <a class="hotspot" href="product3.html" title="快速结算">
+            <span class="hotspot-pulse"></span>
+            <span class="hotspot-icon">⚡</span>
+            <span class="hotspot-label">快速结算</span>
+          </a>
+          <a class="hotspot" href="product4.html" title="先款后货">
+            <span class="hotspot-pulse"></span>
+            <span class="hotspot-icon">💴</span>
+            <span class="hotspot-label">先款后货</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 行情快报 -->
+    <div class="quote-card fade-up" style="animation-delay:.45s">
+      <a class="row row-link" href="#features">
+        <span class="label"><span class="dot"></span>今日回收参考价</span>
+        <span class="value">实时更新 <span class="unit">/ 台起</span> <span class="chev">›</span></span>
+      </a>
+      <div class="row">
+        <span class="label"><span class="dot"></span>深圳区域起收价</span>
+        <span class="value">¥200 <span class="unit">起</span></span>
+      </div>
+      <div class="row">
+        <span class="label"><span class="dot"></span>先款后货</span>
+        <span class="value">¥1000 <span class="unit">起</span></span>
+      </div>
+    </div>
+
+    <!-- 服务优势 -->
+    <div class="section-title fade-up" id="advantages" style="animation-delay:.55s">
+      <span class="bar"></span>
+      <h2>我们的服务优势</h2>
+    </div>
+
+    <div class="features">
+      <div class="feature fade-up" style="animation-delay:.6s">
+        <div class="icon">⚡</div>
+        <div class="text"><b>快速结算</b><br>线到当天打款到账</div>
+      </div>
+      <div class="feature fade-up" style="animation-delay:.65s">
+        <div class="icon">📋</div>
+        <div class="text"><b>报盘表提供</b><br>现场报价现场打款</div>
+      </div>
+      <div class="feature fade-up" style="animation-delay:.7s">
+        <div class="icon">🏭</div>
+        <div class="text"><b>华强北实体工厂</b><br>正规回收资质齐全</div>
+      </div>
+      <div class="feature fade-up" style="animation-delay:.75s">
+        <div class="icon">🕐</div>
+        <div class="text"><b>24 小时起收</b><br>随时上门现场报价</div>
+      </div>
+      <div class="feature fade-up" style="animation-delay:.8s">
+        <div class="icon">📍</div>
+        <div class="text"><b>深圳回收 200 起收</b><br>覆盖全市免费上门</div>
+      </div>
+      <div class="feature fade-up" style="animation-delay:.85s">
+        <div class="icon">🚚</div>
+        <div class="text"><b>先款后货 1000 起收</b><br>量大价优专人对接</div>
+      </div>
+    </div>
+
+    <!-- 功能圆球导航 -->
+    <div class="nav-circles fade-up" id="features" style="animation-delay:.9s">
+      <a class="nav-circle" href="detail1.html">
+        <span class="nc-icon">📱</span>
+        <span class="nc-text">功能1</span>
+      </a>
+      <a class="nav-circle" href="detail2.html">
+        <span class="nc-icon">🔄</span>
+        <span class="nc-text">功能2</span>
+      </a>
+      <a class="nav-circle" href="detail3.html">
+        <span class="nc-icon">💰</span>
+        <span class="nc-text">功能3</span>
+      </a>
+      <a class="nav-circle" href="detail4.html">
+        <span class="nc-icon">🏆</span>
+        <span class="nc-text">功能4</span>
+      </a>
+      <a class="nav-circle" href="detail5.html">
+        <span class="nc-icon">🎁</span>
+        <span class="nc-text">功能5</span>
+      </a>
+      <a class="nav-circle" href="detail6.html">
+        <span class="nc-icon">🔧</span>
+        <span class="nc-text">功能6</span>
+      </a>
+      <a class="nav-circle" href="detail7.html">
+        <span class="nc-icon">📊</span>
+        <span class="nc-text">功能7</span>
+      </a>
+    </div>
+
+    <!-- 二维码区 -->
+    <div class="qr-section fade-up" style="animation-delay:.95s">
+      <div class="qr-title">扫码添加 · 立即报价</div>
+      <div class="qr-sub">长按识别下方二维码联系回收顾问</div>
+
+      <div class="qr-wrap">
+        <img
+          class="qr-img"
+          src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&amp;margin=0&amp;data=https%3A%2F%2Fxcx1669.ycdongxu.com%2Fh5%2F%23%2Fpages%2Ftab%2Fhome"
+          alt="干机循环二维码"
+        />
+      </div>
+
+      <div class="qr-tip"><span class="hand">👆</span> 长按识别二维码</div>
+    </div>
+
+    <!-- 关注渠道 -->
+    <div class="channels fade-up" style="animation-delay:1.05s">
+      <div class="channel">🎵 抖音 · 干机循环</div>
+      <div class="channel">📺 视频号 · 干机循环</div>
+      <div class="channel">📢 公众号 · 干机循环</div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="footer fade-up" style="animation-delay:1.15s">
+      <div class="company">深圳华强北报废机手机源头回收商</div>
+      <div>干机循环 · 让闲置手机循环再生</div>
+      <a href="manage.html" class="admin-link" style="display:inline-block;margin-top:10px;font-size:12px;color:rgba(165,214,167,0.5);text-decoration:none;">图片管理后台 ›</a>
+    </footer>
+  </div>
+</div>
+
+<script>
+  // 页面加载完成后给可交互元素加轻量反馈
+  document.querySelectorAll('.feature').forEach((el, i) => {
+    el.addEventListener('click', () => {
+      el.style.transform = 'scale(0.97)';
+      setTimeout(() => el.style.transform = '', 150);
+    });
+  });
+
+  // 二维码区点击提示（可替换为真实跳转）
+  document.querySelector('.qr-wrap').addEventListener('click', () => {
+    const tip = document.querySelector('.qr-tip');
+    tip.style.color = '#fff';
+    setTimeout(() => tip.style.color = '', 600);
+  });
+
+  // ====== 圆球从 GitHub 仓库读取图片 ======
+  fetch(window.SITE_CONFIG.cdnBase + '/config.json?t=' + Date.now()).then(r => r.json()).then(cfg => {
+    for (let i = 1; i <= 7; i++) {
+      const imgSrc = cfg['detail_img_' + i];
+      if (imgSrc) {
+        const circle = document.querySelector('.nav-circle:nth-child(' + i + ')');
+        if (circle) {
+          circle.classList.add('has-img');
+          circle.innerHTML = '<img class="nc-img" src="' + imgSrc + '" alt="功能' + i + '">';
+        }
+      }
+    }
+  }).catch(() => {});
+</script>
+</body>
+</html>
