@@ -1,0 +1,241 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>快速结算 · 干机循环</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<script src="site-config.js"></script>
+<style>
+  :root {
+    --green-deep:#0f3d24; --green-dark:#1b5e20; --green-mid:#2e7d32;
+    --green:#43a047; --green-bright:#66bb6a; --green-light:#a5d6a7;
+    --gold:#ffd54f;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family:'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif;
+    background:var(--green-deep);
+    color:#fff;
+    min-height:100vh;
+  }
+  .page {
+    min-height:100vh;
+    background:
+      radial-gradient(ellipse at 20% 0%, rgba(102,187,106,0.3), transparent 55%),
+      radial-gradient(ellipse at 80% 100%, rgba(67,160,71,0.2), transparent 50%),
+      linear-gradient(160deg, #1b5e20 0%, #0f3d24 60%, #082916 100%);
+  }
+  .container { max-width:720px; margin:0 auto; padding:24px 20px 60px; }
+  .topbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+  .back-btn {
+    display:inline-flex; align-items:center; gap:6px;
+    padding:8px 16px; background:rgba(255,255,255,0.08);
+    border:1px solid rgba(165,214,167,0.3); border-radius:999px;
+    color:#e8f5e9; text-decoration:none; font-size:14px; transition:background .2s;
+  }
+  .back-btn:hover { background:rgba(255,255,255,0.14); }
+  .topbar h1 { font-size:20px; font-weight:700; letter-spacing:2px; }
+  .topbar .spacer { width:80px; }
+
+  .hero {
+    text-align:center;
+    padding:30px 20px;
+    background:rgba(255,255,255,0.05);
+    border:1px solid rgba(165,214,167,0.15);
+    border-radius:20px;
+    margin-bottom:20px;
+  }
+  .hero .big-icon { font-size:64px; display:block; margin-bottom:12px; }
+  .hero h2 { font-size:26px; margin-bottom:8px; }
+  .hero .price {
+    display:inline-block;
+    font-size:32px; font-weight:900; color:var(--gold);
+    margin:12px 0;
+  }
+  .hero .price small { font-size:16px; color:#a5d6a7; font-weight:400; }
+  .hero .sub { font-size:14px; color:#c5e1a5; }
+
+  .detail-card {
+    background:rgba(255,255,255,0.05);
+    border:1px solid rgba(165,214,167,0.15);
+    border-radius:20px;
+    overflow:hidden;
+    margin-bottom:20px;
+    box-shadow:0 14px 40px rgba(0,0,0,0.3);
+  }
+  .img-box {
+    width:100%;
+    background:rgba(0,0,0,0.2);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+    overflow:auto;
+  }
+  .img-box img {
+    width:100%;
+    height:auto;
+    max-height:70vh;
+    object-fit:contain;
+    cursor:zoom-in;
+    display:block;
+  }
+  .img-preview {
+    position:fixed; inset:0;
+    background:rgba(0,0,0,0.92);
+    display:none;
+    align-items:flex-start;
+    justify-content:center;
+    z-index:999;
+    overflow:auto;
+    padding:30px 16px;
+  }
+  .img-preview.show { display:flex; }
+  .img-preview img {
+    max-width:100%;
+    height:auto;
+    display:block;
+    border-radius:8px;
+  }
+  .img-preview .close-preview {
+    position:fixed; top:16px; right:16px;
+    width:40px; height:40px; border-radius:50%;
+    background:rgba(255,255,255,0.15);
+    border:none; color:#fff; font-size:20px;
+    cursor:pointer; display:flex; align-items:center; justify-content:center;
+  }
+  .placeholder {
+    text-align:center; color:rgba(200,230,201,0.4);
+    padding:40px 20px;
+  }
+  .placeholder .emoji { font-size:56px; display:block; margin-bottom:10px; }
+  .placeholder .txt { font-size:14px; }
+  .body { padding:20px; }
+  .body h3 { font-size:18px; margin-bottom:12px; color:#e8f5e9; }
+  .body p { font-size:14px; line-height:1.8; color:#c5e1a5; }
+  .steps {
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    margin-top:16px;
+  }
+  .step {
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+    padding:12px 14px;
+    background:rgba(102,187,106,0.08);
+    border:1px solid rgba(102,187,106,0.2);
+    border-radius:12px;
+  }
+  .step-num {
+    flex-shrink:0;
+    width:28px; height:28px; border-radius:50%;
+    background:var(--green-bright);
+    color:#0f3d24; font-weight:900; font-size:14px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .step-text { font-size:13px; line-height:1.7; color:#c5e1a5; }
+  .step-text b { color:#e8f5e9; }
+  .tag-list { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }
+  .tag {
+    padding:4px 12px; background:rgba(255,213,79,0.12);
+    border:1px solid rgba(255,213,79,0.3); border-radius:999px;
+    font-size:12px; color:var(--gold);
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="container">
+    <div class="topbar">
+      <a href="index.html" class="back-btn">‹ 返回首页</a>
+      <h1>快速结算</h1>
+      <div class="spacer"></div>
+    </div>
+
+    <div class="hero">
+      <span class="big-icon">⚡</span>
+      <h2>快速结算 · 当天到账</h2>
+      <div class="price">¥1000 <small>起收</small></div>
+      <div class="sub">验货即打款 · 当天到账 · 资金安全</div>
+    </div>
+
+    <div class="detail-card">
+      <div class="img-box" id="imgBox">
+        <div class="placeholder">
+          <span class="emoji">🖼️</span>
+          <span class="txt">暂无图片，请在后台上传替换</span>
+        </div>
+      </div>
+      <div class="body">
+        <h3>服务说明</h3>
+        <p id="descText">我们承诺验货确认后立即打款，最快当天到账。支持多种支付方式，资金安全有保障，让您的资金快速回笼。</p>
+
+        <h3 style="margin-top:20px;">操作流程</h3>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-text"><b>提交货物</b> — 上门或邮寄送达</div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-text"><b>验货报价</b> — 专业验货，给出报价</div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-text"><b>确认打款</b> — 确认后立即打款</div>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-text"><b>当天到账</b> — 最快当天到账完成</div>
+          </div>
+        </div>
+
+        <div class="tag-list">
+          <span class="tag">验货即打款</span>
+          <span class="tag">当天到账</span>
+          <span class="tag">多种支付</span>
+          <span class="tag">资金安全</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="img-preview" id="imgPreview">
+  <button class="close-preview" id="closePreview">✕</button>
+  <img id="previewImg" alt="大图预览" />
+</div>
+
+<script>
+  // 从服务器获取图片和描述（所有用户同步）
+  fetch(window.SITE_CONFIG.cdnBase + '/config.json?t=' + Date.now()).then(r => r.json()).then(cfg => {
+    const img = cfg['product3_img'];
+    if (img) {
+      document.getElementById('imgBox').innerHTML = '<img src="' + img + '" alt="快速结算" id="detailImg">';
+    }
+    const desc = cfg['product3_desc'];
+    if (desc) {
+      document.getElementById('descText').textContent = desc;
+    }
+  }).catch(() => {});
+  const preview = document.getElementById('imgPreview');
+  const previewImg = document.getElementById('previewImg');
+  document.addEventListener('click', (e) => {
+    if (e.target && e.target.id === 'detailImg') {
+      previewImg.src = e.target.src;
+      preview.classList.add('show');
+    }
+  });
+  document.getElementById('closePreview').addEventListener('click', () => {
+    preview.classList.remove('show');
+  });
+  preview.addEventListener('click', (e) => {
+    if (e.target === preview) preview.classList.remove('show');
+  });
+</script>
+</body>
+</html>
